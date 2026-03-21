@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* ===========================
+   PRINT STYLES — A4 Invoice
+   =========================== */
+@media print {
+
+    /* Hide everything except the invoice */
+    body>#root>div>aside,
+    body>#root>div>div>header,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Reset the main layout for print */
+    body,
+    html {
+        background: white !important;
+        font-size: 11pt;
+    }
+
+    /* Make the main content full width */
+    body>#root>div {
+        display: block !important;
+    }
+
+    body>#root>div>div>main {
+        padding: 0 !important;
+    }
+
+    /* A4 paper styling */
+    #invoice-print-area {
+        width: 100%;
+        max-width: 210mm;
+        margin: 0 auto;
+        padding: 10mm;
+        box-shadow: none !important;
+    }
+
+    /* Show all cards in 2 columns */
+    #invoice-print-area>div {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8mm;
+    }
+
+    /* Hide edit buttons on cards */
+    #invoice-print-area button[type="button"] {
+        display: none !important;
+    }
+
+    /* Print header */
+    #invoice-print-area::before {
+        content: "LOGISTICS ERP — HAWB SHIPMENT INVOICE";
+        display: block;
+        font-size: 16pt;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 8mm;
+        padding-bottom: 4mm;
+        border-bottom: 2px solid #4338ca;
+        color: #1e1b4b;
+        grid-column: 1 / -1;
+    }
+
+    /* Page settings */
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+}
