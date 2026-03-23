@@ -64,6 +64,22 @@ if __name__ == '__main__':
     app = create_app()
     with app.app_context():
         db.create_all()
+        # Auto-seed admin if no users exist (fix for new deployments)
+        from models import User
+        if User.query.count() == 0:
+            print("No users found. Creating default admin...")
+            hashed_pw = bcrypt.generate_password_hash("admin123").decode('utf-8')
+            admin = User(
+                first_name="System",
+                last_name="Admin",
+                email="admin@erp.com",
+                username="admin@erp.com",
+                password=hashed_pw,
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print("Admin created: admin@erp.com / admin123")
+
     # Support Render's dynamic port and binding requirement
     port = int(os.environ.get("PORT", 8000))
     app.run(host='0.0.0.0', port=port, debug=False)
