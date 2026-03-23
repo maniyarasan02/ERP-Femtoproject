@@ -6,3 +6,5 @@ flask-cors
 python-dotenv
 python-dateutil
 gunicorn
+flask
+gunicorn
