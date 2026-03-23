@@ -1,16 +1,23 @@
-# React + Vite
+# Logistics ERP - Full-Stack Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, professional Enterprise Resource Planning (ERP) application designed for logistics and supply chain management. This project features a clean React frontend and a robust Flask backend with a unified, production-ready architecture.
 
-Currently, two official plugins are available:
+## 🚀 Features
+- **Secure Authentication**: JWT-based login and user registration with encrypted passwords.
+- **Customer Management**: Full CRM suite to add, search, and manage global clients and their GSTIN details.
+- **Shipment Tracking**: Comprehensive workflow for creating and tracking House Air Waybills (HAWB).
+- **Inventory Control**: Real-time stock monitoring and categorization across multiple warehouses.
+- **Dynamic Dashboard**: Live business analytics and operational statistics.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Technology Stack
+- **Frontend**: React (Vite), Tailwind CSS, Lucide Icons, React Router.
+- **Backend**: Flask (Python), SQLAlchemy (SQLite), Flask-JWT-Extended, Bcrypt.
+- **Deployment**: Configured for 24/7 hosting on Render.com with Gunicorn.
 
-## React Compiler
+## 📦 Getting Started
+1. **Easy Launch**: Double-click `Start_App.bat` in the root folder to start both the server and the browser.
+2. **Database Access**: Located in `backend/instance/db.sqlite3`.
+3. **Admin Login**: `admin@erp.com` / `admin123`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+*Created with focus on performance, security, and premium user experience.*
