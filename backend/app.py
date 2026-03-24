@@ -32,8 +32,8 @@ def create_app():
     bcrypt.init_app(app)
     jwt.init_app(app)
     
-    # Allow localhost:5173 for Vite development proxy
-    CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://localhost:3000"]}})
+    # Allow standard development ports for Vite (5173), Next/React (3000), and Angular (4200)
+    CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": ["http://localhost:5173", "http://localhost:3000", "http://localhost:4200", "http://127.0.0.1:4200", "http://127.0.0.1:5173", "http://127.0.0.1:3000"]}})
 
     # Register Blueprints
     from routes.auth import auth_bp
