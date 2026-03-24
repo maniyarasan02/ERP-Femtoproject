@@ -3,6 +3,23 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Package, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
+const Field = ({ label, name, type = 'text', value, onChange, placeholder, rightEl }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        <div className="relative">
+            <input
+                type={type}
+                name={name}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder}
+                className="w-full h-10 px-3 pr-10 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            />
+            {rightEl}
+        </div>
+    </div>
+);
+
 const RegisterPage = () => {
     const navigate = useNavigate();
     const { register, showToast } = useAuth();
@@ -48,7 +65,6 @@ const RegisterPage = () => {
                 password: form.password 
             });
             if (result.success) {
-                // Success toast is handled in AuthContext
                 navigate('/login');
             } else {
                 const msg = result.error || 'Registration failed. Try a different email.';
@@ -63,23 +79,6 @@ const RegisterPage = () => {
             setLoading(false);
         }
     };
-
-    const Field = ({ label, name, type = 'text', placeholder, rightEl }) => (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-            <div className="relative">
-                <input
-                    type={type}
-                    name={name}
-                    value={form[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    className="w-full h-10 px-3 pr-10 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                />
-                {rightEl}
-            </div>
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-800 to-sky-700 flex items-center justify-center p-4">
@@ -104,45 +103,39 @@ const RegisterPage = () => {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <Field label="Full Name" name="name" placeholder="John Doe" />
-                        <Field label="Email Address" name="email" type="email" placeholder="john@example.com" />
-                        <Field label="Phone Number" name="phone" placeholder="9876543210" />
+                        <Field label="Full Name" name="name" value={form.name} onChange={handleChange} placeholder="John Doe" />
+                        <Field label="Email Address" name="email" value={form.email} onChange={handleChange} type="email" placeholder="john@example.com" />
+                        <Field label="Phone Number" name="phone" value={form.phone} onChange={handleChange} placeholder="9876543210" />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPass ? 'text' : 'password'}
-                                    name="password"
-                                    value={form.password}
-                                    onChange={handleChange}
-                                    placeholder="Min. 6 characters"
-                                    className="w-full h-10 px-3 pr-10 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                />
+                        <Field 
+                            label="Password" 
+                            name="password" 
+                            type={showPass ? 'text' : 'password'} 
+                            value={form.password} 
+                            onChange={handleChange} 
+                            placeholder="Min. 6 characters" 
+                            rightEl={
                                 <button type="button" onClick={() => setShowPass(p => !p)}
                                     className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
                                     {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
-                            </div>
-                        </div>
+                            }
+                        />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showConfirmPass ? 'text' : 'password'}
-                                    name="confirmPassword"
-                                    value={form.confirmPassword}
-                                    onChange={handleChange}
-                                    placeholder="Repeat password"
-                                    className="w-full h-10 px-3 pr-10 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                                />
+                        <Field 
+                            label="Confirm Password" 
+                            name="confirmPassword" 
+                            type={showConfirmPass ? 'text' : 'password'} 
+                            value={form.confirmPassword} 
+                            onChange={handleChange} 
+                            placeholder="Repeat password" 
+                            rightEl={
                                 <button type="button" onClick={() => setShowConfirmPass(p => !p)}
                                     className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
                                     {showConfirmPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
-                            </div>
-                        </div>
+                            }
+                        />
 
                         <button
                             type="submit"
