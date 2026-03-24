@@ -4,6 +4,7 @@ import { Card, CardContent } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Search, Plus, Package, AlertTriangle, RefreshCw } from 'lucide-react';
 import { inventoryAPI } from '../lib/api';
+import AddInventoryModal from '../components/AddInventoryModal';
 
 const StockBadge = ({ stock, reorder_level }) => {
   if (stock === 0) return <span className="px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700">Out of Stock</span>;
@@ -17,8 +18,9 @@ const InventoryPage = () => {
   const [filter, setFilter] = useState('All');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const fetchItems = async (q = '', cat = '') => {
+  const fetchItems = async (q = search, cat = filter) => {
     setLoading(true);
     setError('');
     try {
@@ -59,10 +61,16 @@ const InventoryPage = () => {
             <h1 className="text-2xl font-bold text-gray-900">Inventory Management</h1>
             <p className="text-gray-500 text-sm mt-1">{items.length} items tracked</p>
           </div>
-          <Button className="flex items-center gap-2">
+          <Button onClick={() => setIsModalOpen(true)} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200">
             <Plus className="h-4 w-4" /> Add Item
           </Button>
         </div>
+
+        <AddInventoryModal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)} 
+            onSuccess={() => fetchItems()} 
+        />
 
         {/* Error Banner */}
         {error && (
