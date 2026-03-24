@@ -22,37 +22,43 @@ def get_inventory():
 @jwt_required()
 def create_inventory():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     
-    if InventoryItem.query.filter_by(sku=data.get('sku')).first():
-        return jsonify({"sku": ["An item with this SKU already exists."]}), 400
+    sku = data.get('sku', '').strip().upper()
+    name = data.get('name', '').strip()
+    
+    if not sku or not name:
+        return jsonify({"error": "SKU and Name are required"}), 400
+
+    if InventoryItem.query.filter_by(sku=sku).first():
+        return jsonify({"error": f"An item with SKU '{sku}' already exists."}), 400
 
     item = InventoryItem(
-        sku=data.get('sku'),
-        name=data.get('name'),
-        category=data.get('category', ''),
+        sku=sku,
+        name=name,
+        category=data.get('category', '').strip(),
         stock=data.get('stock', 0),
-        unit=data.get('unit', 'pcs'),
+        unit=data.get('unit', 'pcs').strip(),
         reorder_level=data.get('reorder_level', 10),
-        location=data.get('location', '')
+        location=data.get('location', '').strip()
     )
     db.session.add(item)
     db.session.commit()
     return jsonify(item.to_dict()), 201
-
-@inventory_bp.route('/<int:id>/', methods=['GET'])
-@jwt_required()
-def get_item(id):
-    item = InventoryItem.query.get_or_404(id)
-    return jsonify(item.to_dict()), 200
 
 @inventory_bp.route('/<int:id>/', methods=['PUT'])
 @jwt_required()
 def update_item(id):
     item = InventoryItem.query.get_or_404(id)
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     
     for key, value in data.items():
         if hasattr(item, key):
+            if isinstance(value, str):
+                value = value.strip()
             setattr(item, key, value)
             
     db.session.commit()

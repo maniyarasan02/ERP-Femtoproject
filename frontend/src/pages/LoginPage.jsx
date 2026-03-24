@@ -5,34 +5,48 @@ import { useAuth } from '../context/AuthContext';
 
 const LoginPage = () => {
     const navigate = useNavigate();
-    const { login } = useAuth();
+    const { login, showToast } = useAuth();
 
     const [form, setForm] = useState({ email: '', password: '' });
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Reactive validation state
+    const isEmailValid = /^\S+@\S+\.\S+$/.test(form.email.trim());
+    const isPasswordValid = form.password.length >= 6;
+    const isFormValid = isEmailValid && isPasswordValid;
+
     const handleChange = (e) => {
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-        setError('');
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+        if (error) setError('');
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!form.email || !form.password) {
-            setError('Please fill in all fields.');
+        if (!isFormValid) {
+            setError('Please enter a valid email and password (min 6 chars).');
             return;
         }
+
         setLoading(true);
-        setTimeout(() => {
-            const result = login(form.email, form.password);
-            setLoading(false);
+        try {
+            const result = await login(form.email.trim(), form.password);
             if (result.success) {
                 navigate('/');
             } else {
-                setError(result.error);
+                const msg = result.error || 'Invalid credentials. Please try again.';
+                setError(msg);
+                showToast(msg, 'error');
+                setLoading(false);
             }
-        }, 600);
+        } catch (err) {
+            const msg = 'Connection failed. Please check your internet.';
+            setError(msg);
+            showToast(msg, 'error');
+            setLoading(false);
+        }
     };
 
     return (
@@ -111,8 +125,8 @@ const LoginPage = () => {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+                            disabled={loading || !isFormValid}
+                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-indigo-200"
                         >
                             {loading ? (
                                 <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />

@@ -30,32 +30,32 @@ def create_shipment():
         created_by_id=user_id,
         
         # Shipper
-        shipper_name=data.get('shipper_name'),
-        shipper_address=data.get('shipper_address', ''),
-        shipper_city=data.get('shipper_city', ''),
-        shipper_state=data.get('shipper_state', ''),
-        shipper_pincode=data.get('shipper_pincode', ''),
-        shipper_phone=data.get('shipper_phone', ''),
-        shipper_email=data.get('shipper_email', ''),
-        shipper_gstin=data.get('shipper_gstin', ''),
+        shipper_name=data.get('shipper_name', '').strip(),
+        shipper_address=data.get('shipper_address', '').strip(),
+        shipper_city=data.get('shipper_city', '').strip(),
+        shipper_state=data.get('shipper_state', '').strip(),
+        shipper_pincode=data.get('shipper_pincode', '').strip(),
+        shipper_phone=data.get('shipper_phone', '').strip(),
+        shipper_email=data.get('shipper_email', '').strip().lower(),
+        shipper_gstin=data.get('shipper_gstin', '').strip(),
 
         # Receiver
-        receiver_name=data.get('receiver_name'),
-        receiver_address=data.get('receiver_address', ''),
-        receiver_city=data.get('receiver_city', ''),
-        receiver_state=data.get('receiver_state', ''),
-        receiver_pincode=data.get('receiver_pincode', ''),
-        receiver_phone=data.get('receiver_phone', ''),
-        receiver_email=data.get('receiver_email', ''),
-        receiver_gstin=data.get('receiver_gstin', ''),
+        receiver_name=data.get('receiver_name', '').strip(),
+        receiver_address=data.get('receiver_address', '').strip(),
+        receiver_city=data.get('receiver_city', '').strip(),
+        receiver_state=data.get('receiver_state', '').strip(),
+        receiver_pincode=data.get('receiver_pincode', '').strip(),
+        receiver_phone=data.get('receiver_phone', '').strip(),
+        receiver_email=data.get('receiver_email', '').strip().lower(),
+        receiver_gstin=data.get('receiver_gstin', '').strip(),
 
         # Info
-        service_type=data.get('service_type', 'standard'),
-        transport_mode=data.get('transport_mode', 'surface'),
-        origin=data.get('origin', ''),
-        destination=data.get('destination', ''),
-        reference_number=data.get('reference_number', ''),
-        status=data.get('status', 'draft'),
+        service_type=data.get('service_type', 'standard').strip(),
+        transport_mode=data.get('transport_mode', 'surface').strip(),
+        origin=data.get('origin', '').strip(),
+        destination=data.get('destination', '').strip(),
+        reference_number=data.get('reference_number', '').strip(),
+        status=data.get('status', 'draft').strip(),
 
         # Weight
         total_actual_weight=float(data.get('total_actual_weight', 0) or 0),
@@ -63,10 +63,10 @@ def create_shipment():
         chargeable_weight=float(data.get('chargeable_weight', 0) or 0),
 
         # Routing
-        eway_bill_number=data.get('eway_bill_number', ''),
-        carrier_name=data.get('carrier_name', ''),
-        vehicle_number=data.get('vehicle_number', ''),
-        tracking_id=data.get('tracking_id', ''),
+        eway_bill_number=data.get('eway_bill_number', '').strip(),
+        carrier_name=data.get('carrier_name', '').strip(),
+        vehicle_number=data.get('vehicle_number', '').strip(),
+        tracking_id=data.get('tracking_id', '').strip(),
 
         # Insurance
         is_insured=bool(data.get('is_insured', False)),

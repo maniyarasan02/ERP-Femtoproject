@@ -1,10 +1,14 @@
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import CreateShipment from './pages/CreateShipment';
-import CustomersPage from './pages/CustomersPage';
-import InventoryPage from './pages/InventoryPage';
+import LoadingSpinner from './components/LoadingSpinner';
+
+// Lazy load pages for better bundle performance
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const CreateShipment = lazy(() => import('./pages/CreateShipment'));
+const CustomersPage = lazy(() => import('./pages/CustomersPage'));
+const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 
 // Protect routes — redirect to /login if not authenticated
 const ProtectedRoute = ({ children }) => {
@@ -22,19 +26,21 @@ const PublicRoute = ({ children }) => {
 
 function AppRoutes() {
   return (
-    <Routes>
-      {/* Public */}
-      <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+    <Suspense fallback={<LoadingSpinner fullScreen />}>
+      <Routes>
+        {/* Public */}
+        <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+        <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-      {/* Protected */}
-      <Route path="/" element={<ProtectedRoute><CreateShipment /></ProtectedRoute>} />
-      <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
-      <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
+        {/* Protected */}
+        <Route path="/" element={<ProtectedRoute><CreateShipment /></ProtectedRoute>} />
+        <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
+        <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 

@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 const RegisterPage = () => {
     const navigate = useNavigate();
-    const { register } = useAuth();
+    const { register, showToast } = useAuth();
 
     const [form, setForm] = useState({
         name: '', email: '', phone: '', password: '', confirmPassword: ''
@@ -15,36 +15,28 @@ const RegisterPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
+    // Reactive validation
+    const cleanName = form.name.trim();
+    const cleanEmail = form.email.trim();
+    const cleanPhone = form.phone.trim();
+    
+    const isNameValid = cleanName.length >= 2;
+    const isEmailValid = /^\S+@\S+\.\S+$/.test(cleanEmail);
+    const isPhoneValid = /^\d{10}$/.test(cleanPhone);
+    const isPasswordValid = form.password.length >= 6;
+    const isConfirmValid = form.password === form.confirmPassword && form.confirmPassword.length > 0;
+    
+    const isFormValid = isNameValid && isEmailValid && isPhoneValid && isPasswordValid && isConfirmValid;
+
     const handleChange = (e) => {
-        setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-        setError('');
+        const { name, value } = e.target;
+        setForm(prev => ({ ...prev, [name]: value }));
+        if (error) setError('');
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const { name, email, phone, password, confirmPassword } = form;
-
-        // Trim values to handle whitespace/autocomplete quirks
-        const cleanName = name.trim();
-        const cleanEmail = email.trim();
-        const cleanPhone = phone.trim();
-
-        if (!cleanName || !cleanEmail || !cleanPhone || !password || !confirmPassword) {
-            console.error("Validation failed. Form state:", { cleanName, cleanEmail, cleanPhone, password: !!password, confirmPassword: !!confirmPassword });
-            setError('Please fill in all fields.'); return;
-        }
-        if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
-            setError('Please enter a valid email address.'); return;
-        }
-        if (!/^\d{10}$/.test(cleanPhone)) {
-            setError('Phone number must be exactly 10 digits.'); return;
-        }
-        if (password.length < 6) {
-            setError('Password must be at least 6 characters.'); return;
-        }
-        if (password !== confirmPassword) {
-            setError('Passwords do not match.'); return;
-        }
+        if (!isFormValid) return;
 
         setLoading(true);
         setError('');
@@ -53,18 +45,22 @@ const RegisterPage = () => {
                 name: cleanName, 
                 email: cleanEmail, 
                 phone: cleanPhone, 
-                password 
+                password: form.password 
             });
-            setLoading(false);
             if (result.success) {
-                alert('Account created successfully! You can now log in.');
+                // Success toast is handled in AuthContext
                 navigate('/login');
             } else {
-                setError(result.error || 'Registration failed. Try a different email.');
+                const msg = result.error || 'Registration failed. Try a different email.';
+                setError(msg);
+                showToast(msg, 'error');
+                setLoading(false);
             }
         } catch (err) {
+            const msg = 'An unexpected error occurred. Please check your connection.';
+            setError(msg);
+            showToast(msg, 'error');
             setLoading(false);
-            setError('An unexpected error occurred. Please check your connection.');
         }
     };
 
@@ -150,8 +146,8 @@ const RegisterPage = () => {
 
                         <button
                             type="submit"
-                            disabled={loading}
-                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-colors disabled:opacity-60 mt-2"
+                            disabled={loading || !isFormValid}
+                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-indigo-200 mt-2"
                         >
                             {loading ? (
                                 <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />

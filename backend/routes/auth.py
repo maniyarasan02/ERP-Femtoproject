@@ -8,25 +8,36 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register/', methods=['POST'])
 def register():
     data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    first_name = data.get('first_name', '')
-    last_name = data.get('last_name', '')
-    username = data.get('username') or email
-    phone = data.get('phone', '')
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
 
-    if not email or not password:
-        return jsonify({"error": "Email and password are required"}), 400
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+    phone = data.get('phone', '').strip()
+    
+    # Simple formatting for name if only 'name' was provided
+    if not first_name and data.get('name'):
+        parts = data.get('name').strip().split(' ', 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ""
+
+    if not email or not password or not first_name:
+        return jsonify({"error": "Name, Email and password are required"}), 400
 
     if User.query.filter_by(email=email).first():
-        return jsonify({"email": ["Email already registered."]}), 400
+        return jsonify({"error": "This email is already registered."}), 400
+
+    if not "@" in email or not "." in email:
+        return jsonify({"error": "Please provide a valid email address."}), 400
 
     hashed_pw = bcrypt.generate_password_hash(password).decode('utf-8')
     new_user = User(
         first_name=first_name,
         last_name=last_name,
         email=email,
-        username=username,
+        username=email, # Use email as username for simplicity
         password=hashed_pw,
         phone=phone
     )
@@ -47,7 +58,10 @@ def register():
 @auth_bp.route('/login/', methods=['POST'])
 def login():
     data = request.get_json()
-    email = data.get('email', '').strip()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
 
     user = User.query.filter_by(email=email).first()

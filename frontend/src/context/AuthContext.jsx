@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { authAPI, saveTokens, clearTokens, getAccessToken } from '../lib/api';
+import Toast from '../components/Toast';
 
 const AuthContext = createContext();
 
@@ -7,7 +8,6 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem('erp_user');
-      // Only restore if we still have a token
       if (stored && getAccessToken()) {
         return JSON.parse(stored);
       }
@@ -16,6 +16,12 @@ export const AuthProvider = ({ children }) => {
       return null;
     }
   });
+
+  const [toast, setToast] = useState(null);
+
+  const showToast = useCallback((message, type = 'info') => {
+    setToast({ message, type });
+  }, []);
 
   const login = async (email, password) => {
     try {
@@ -30,6 +36,7 @@ export const AuthProvider = ({ children }) => {
         };
         setUser(userData);
         localStorage.setItem('erp_user', JSON.stringify(userData));
+        showToast(`Welcome back, ${userData.name}!`, 'success');
         return { success: true };
       }
       return { success: false, error: data.error || 'Invalid email or password.' };
@@ -42,11 +49,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const { ok, data } = await authAPI.register({ name, email, phone, password });
       if (ok) {
+        showToast('Registration successful! Please log in.', 'success');
         return { success: true };
       }
-      // Flatten DRF validation errors
-      const firstError = Object.values(data)[0];
-      const msg = Array.isArray(firstError) ? firstError[0] : (data.error || 'Registration failed.');
+      const msg = data.error || 'Registration failed.';
       return { success: false, error: msg };
     } catch (err) {
       return { success: false, error: 'Could not connect to server. Is the backend running?' };
@@ -56,11 +62,19 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     clearTokens();
+    showToast('Logged out successfully.', 'info');
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, showToast }}>
       {children}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)} 
+        />
+      )}
     </AuthContext.Provider>
   );
 };

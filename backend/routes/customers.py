@@ -22,19 +22,27 @@ def get_customers():
 @jwt_required()
 def create_customer():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     
-    if Customer.query.filter_by(email=data.get('email')).first():
-        return jsonify({"email": ["A customer with this email already exists."]}), 400
+    email = data.get('email', '').strip().lower()
+    name = data.get('name', '').strip()
+    
+    if not email or not name:
+        return jsonify({"error": "Name and Email are required"}), 400
+
+    if Customer.query.filter_by(email=email).first():
+        return jsonify({"error": "A customer with this email already exists."}), 400
 
     customer = Customer(
-        name=data.get('name'),
-        email=data.get('email'),
-        phone=data.get('phone'),
-        city=data.get('city'),
-        state=data.get('state', ''),
-        pincode=data.get('pincode', ''),
-        gstin=data.get('gstin', ''),
-        address=data.get('address', '')
+        name=name,
+        email=email,
+        phone=data.get('phone', '').strip(),
+        city=data.get('city', '').strip(),
+        state=data.get('state', '').strip(),
+        pincode=data.get('pincode', '').strip(),
+        gstin=data.get('gstin', '').strip(),
+        address=data.get('address', '').strip()
     )
     db.session.add(customer)
     db.session.commit()
@@ -51,9 +59,13 @@ def get_customer(id):
 def update_customer(id):
     customer = Customer.query.get_or_404(id)
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
     
     for key, value in data.items():
         if hasattr(customer, key):
+            if isinstance(value, str):
+                value = value.strip()
             setattr(customer, key, value)
             
     db.session.commit()
