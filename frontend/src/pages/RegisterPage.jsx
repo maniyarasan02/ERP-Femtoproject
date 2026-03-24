@@ -1,24 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Package, UserPlus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-
-const Field = ({ label, name, type = 'text', value, onChange, placeholder, rightEl }) => (
-    <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        <div className="relative">
-            <input
-                type={type}
-                name={name}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className="w-full h-10 px-3 pr-10 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            />
-            {rightEl}
-        </div>
-    </div>
-);
 
 const RegisterPage = () => {
     const navigate = useNavigate();
@@ -32,7 +15,7 @@ const RegisterPage = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Reactive validation
+    // Reactive validation constants
     const cleanName = form.name.trim();
     const cleanEmail = form.email.trim();
     const cleanPhone = form.phone.trim();
@@ -45,11 +28,11 @@ const RegisterPage = () => {
     
     const isFormValid = isNameValid && isEmailValid && isPhoneValid && isPasswordValid && isConfirmValid;
 
-    const handleChange = (e) => {
+    const handleChange = useCallback((e) => {
         const { name, value } = e.target;
         setForm(prev => ({ ...prev, [name]: value }));
-        if (error) setError('');
-    };
+        // Don't clear error here as it might trigger re-renders mid-step
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -80,79 +63,124 @@ const RegisterPage = () => {
         }
     };
 
+    const inputClasses = "w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-sm focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all";
+    const labelClasses = "block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider";
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-indigo-800 to-sky-700 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Logo */}
-                <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-white/10 backdrop-blur-sm mb-3 border border-white/20">
-                        <Package className="h-7 w-7 text-sky-300" />
+                <div className="text-center mb-8">
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-white/5 backdrop-blur-xl mb-4 border border-white/10 shadow-2xl">
+                        <Package className="h-8 w-8 text-indigo-400" />
                     </div>
-                    <h1 className="text-2xl font-bold text-white">LogisticsERP</h1>
-                    <p className="text-indigo-200 mt-1 text-sm">Create your account</p>
+                    <h1 className="text-3xl font-bold text-white tracking-tight">LogisticsERP</h1>
+                    <p className="text-slate-400 mt-2 text-sm font-medium">Create your high-performance account</p>
                 </div>
 
-                {/* Card */}
-                <div className="bg-white rounded-2xl shadow-2xl p-8">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-5">Register</h2>
+                <div className="bg-white rounded-[2rem] shadow-2xl p-8 md:p-10 border border-slate-100">
+                    <h2 className="text-xl font-bold text-slate-900 mb-2">Register</h2>
+                    <p className="text-slate-500 text-sm mb-8 font-medium">Please enter your details to continue</p>
 
                     {error && (
-                        <div className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+                        <div className="mb-6 px-4 py-3 rounded-xl bg-rose-50 border border-rose-100 text-sm text-rose-600 font-medium">
                             {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <Field label="Full Name" name="name" value={form.name} onChange={handleChange} placeholder="John Doe" />
-                        <Field label="Email Address" name="email" value={form.email} onChange={handleChange} type="email" placeholder="john@example.com" />
-                        <Field label="Phone Number" name="phone" value={form.phone} onChange={handleChange} placeholder="9876543210" />
+                    <form onSubmit={handleSubmit} className="space-y-5">
+                        {/* Full Name */}
+                        <div>
+                            <label className={labelClasses}>Full Name</label>
+                            <input
+                                type="text"
+                                name="name"
+                                value={form.name}
+                                onChange={handleChange}
+                                placeholder="John Doe"
+                                className={inputClasses}
+                            />
+                        </div>
 
-                        <Field 
-                            label="Password" 
-                            name="password" 
-                            type={showPass ? 'text' : 'password'} 
-                            value={form.password} 
-                            onChange={handleChange} 
-                            placeholder="Min. 6 characters" 
-                            rightEl={
+                        {/* Email Address */}
+                        <div>
+                            <label className={labelClasses}>Email Address</label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={form.email}
+                                onChange={handleChange}
+                                placeholder="john@example.com"
+                                className={inputClasses}
+                            />
+                        </div>
+
+                        {/* Phone Number */}
+                        <div>
+                            <label className={labelClasses}>Phone Number</label>
+                            <input
+                                type="tel"
+                                name="phone"
+                                value={form.phone}
+                                onChange={handleChange}
+                                placeholder="10-digit number"
+                                className={inputClasses}
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label className={labelClasses}>Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPass ? 'text' : 'password'}
+                                    name="password"
+                                    value={form.password}
+                                    onChange={handleChange}
+                                    placeholder="Min. 6 characters"
+                                    className={inputClasses}
+                                />
                                 <button type="button" onClick={() => setShowPass(p => !p)}
-                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                    className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 hover:text-indigo-600 transition-colors">
                                     {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
-                            }
-                        />
+                            </div>
+                        </div>
 
-                        <Field 
-                            label="Confirm Password" 
-                            name="confirmPassword" 
-                            type={showConfirmPass ? 'text' : 'password'} 
-                            value={form.confirmPassword} 
-                            onChange={handleChange} 
-                            placeholder="Repeat password" 
-                            rightEl={
+                        {/* Confirm Password */}
+                        <div>
+                            <label className={labelClasses}>Confirm Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showConfirmPass ? 'text' : 'password'}
+                                    name="confirmPassword"
+                                    value={form.confirmPassword}
+                                    onChange={handleChange}
+                                    placeholder="Repeat password"
+                                    className={inputClasses}
+                                />
                                 <button type="button" onClick={() => setShowConfirmPass(p => !p)}
-                                    className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-400 hover:text-gray-600">
+                                    className="absolute inset-y-0 right-0 flex items-center px-4 text-slate-400 hover:text-indigo-600 transition-colors">
                                     {showConfirmPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                 </button>
-                            }
-                        />
+                            </div>
+                        </div>
 
                         <button
                             type="submit"
                             disabled={loading || !isFormValid}
-                            className="w-full h-11 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-indigo-200 mt-2"
+                            className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-indigo-200 hover:shadow-indigo-300 active:scale-[0.98] mt-4"
                         >
                             {loading ? (
-                                <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                                <span className="animate-spin h-5 w-5 border-3 border-white border-t-transparent rounded-full" />
                             ) : (
-                                <><UserPlus className="h-4 w-4" />Create Account</>
+                                <><UserPlus className="h-5 w-5" />Create Account</>
                             )}
                         </button>
                     </form>
 
-                    <p className="text-center text-sm text-gray-500 mt-5">
+                    <p className="text-center text-sm text-slate-500 mt-8 font-medium">
                         Already have an account?{' '}
-                        <Link to="/login" className="text-indigo-600 font-semibold hover:text-indigo-800">
+                        <Link to="/login" className="text-indigo-600 font-bold hover:text-indigo-800 transition-colors">
                             Sign In
                         </Link>
                     </p>
