@@ -67,18 +67,28 @@ if __name__ == '__main__':
         # Auto-seed admin if no users exist (fix for new deployments)
         from models import User
         if User.query.count() == 0:
-            print("No users found. Creating default admin...")
-            hashed_pw = bcrypt.generate_password_hash("admin123").decode('utf-8')
+            print("No users found. Seeding default accounts...")
+            
+            # Default Admin
+            admin_hash = bcrypt.generate_password_hash("admin123").decode('utf-8')
             admin = User(
-                first_name="System",
-                last_name="Admin",
-                email="admin@erp.com",
-                username="admin@erp.com",
-                password=hashed_pw,
+                first_name="System", last_name="Admin",
+                email="admin@erp.com", username="admin@erp.com",
+                password=admin_hash,
             )
             db.session.add(admin)
+
+            # User's Requested Account (Mani)
+            mani_hash = bcrypt.generate_password_hash("mani@123").decode('utf-8')
+            mani = User(
+                first_name="Mani", last_name="Yarasan",
+                email="maniyarasanvetriselvan@gmail.com", username="maniyarasanvetriselvan@gmail.com",
+                password=mani_hash,
+            )
+            db.session.add(mani)
+
             db.session.commit()
-            print("Admin created: admin@erp.com / admin123")
+            print("Database seeded: admin@erp.com and maniyarasanvetriselvan@gmail.com")
 
     # Support Render's dynamic port and binding requirement
     port = int(os.environ.get("PORT", 8000))
