@@ -24,14 +24,20 @@ const RegisterPage = () => {
         e.preventDefault();
         const { name, email, phone, password, confirmPassword } = form;
 
-        if (!name || !email || !phone || !password || !confirmPassword) {
-            setError('All fields are required.'); return;
+        // Trim values to handle whitespace/autocomplete quirks
+        const cleanName = name.trim();
+        const cleanEmail = email.trim();
+        const cleanPhone = phone.trim();
+
+        if (!cleanName || !cleanEmail || !cleanPhone || !password || !confirmPassword) {
+            console.error("Validation failed. Form state:", { cleanName, cleanEmail, cleanPhone, password: !!password, confirmPassword: !!confirmPassword });
+            setError('Please fill in all fields.'); return;
         }
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
+        if (!/^\S+@\S+\.\S+$/.test(cleanEmail)) {
             setError('Please enter a valid email address.'); return;
         }
-        if (!/^\d{10}$/.test(phone)) {
-            setError('Phone number must be 10 digits.'); return;
+        if (!/^\d{10}$/.test(cleanPhone)) {
+            setError('Phone number must be exactly 10 digits.'); return;
         }
         if (password.length < 6) {
             setError('Password must be at least 6 characters.'); return;
@@ -41,18 +47,24 @@ const RegisterPage = () => {
         }
 
         setLoading(true);
+        setError('');
         try {
-            const result = await register({ name, email, phone, password });
+            const result = await register({ 
+                name: cleanName, 
+                email: cleanEmail, 
+                phone: cleanPhone, 
+                password 
+            });
             setLoading(false);
             if (result.success) {
-                alert('Account created successfully! Please login.');
+                alert('Account created successfully! You can now log in.');
                 navigate('/login');
             } else {
-                setError(result.error);
+                setError(result.error || 'Registration failed. Try a different email.');
             }
         } catch (err) {
             setLoading(false);
-            setError('An unexpected error occurred. Please try again.');
+            setError('An unexpected error occurred. Please check your connection.');
         }
     };
 
