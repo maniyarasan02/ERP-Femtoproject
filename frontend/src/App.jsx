@@ -7,6 +7,7 @@ import LoadingSpinner from './components/LoadingSpinner';
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const CreateShipment = lazy(() => import('./pages/CreateShipment'));
+const ShipmentsPage = lazy(() => import('./pages/ShipmentsPage'));
 const CustomersPage = lazy(() => import('./pages/CustomersPage'));
 const InventoryPage = lazy(() => import('./pages/InventoryPage'));
 
@@ -34,6 +35,7 @@ function AppRoutes() {
 
         {/* Protected */}
         <Route path="/" element={<ProtectedRoute><CreateShipment /></ProtectedRoute>} />
+        <Route path="/shipments" element={<ProtectedRoute><ShipmentsPage /></ProtectedRoute>} />
         <Route path="/customers" element={<ProtectedRoute><CustomersPage /></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
 

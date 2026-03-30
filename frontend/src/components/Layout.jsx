@@ -5,7 +5,8 @@ import { Button } from './ui/Button';
 import { useAuth } from '../context/AuthContext';
 
 const NAV_ITEMS = [
-    { icon: <Truck />, label: 'Shipments', to: '/' },
+    { icon: <Truck />, label: 'New Shipment', to: '/' },
+    { icon: <Search />, label: 'Track / Search', to: '/shipments' },
     { icon: <Users />, label: 'Customers', to: '/customers' },
     { icon: <Package />, label: 'Inventory', to: '/inventory' },
 ];

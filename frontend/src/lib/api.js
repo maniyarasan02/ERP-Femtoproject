@@ -106,6 +106,10 @@ export const shipmentsAPI = {
     const res = await apiFetch(`/shipments/${status ? `?status=${status}` : ''}`);
     return res.json();
   },
+  search: async (hawb) => {
+    const res = await apiFetch(`/shipments/search/?hawb=${encodeURIComponent(hawb)}`);
+    return res.json();
+  },
   create: async (data) => {
     const res = await apiFetch('/shipments/', { method: 'POST', body: JSON.stringify(data) });
     return res.json();
@@ -117,6 +121,9 @@ export const shipmentsAPI = {
   update: async (id, data) => {
     const res = await apiFetch(`/shipments/${id}/`, { method: 'PUT', body: JSON.stringify(data) });
     return res.json();
+  },
+  delete: async (id) => {
+    await apiFetch(`/shipments/${id}/`, { method: 'DELETE' });
   },
 };
 

@@ -100,10 +100,36 @@ def create_shipment():
     db.session.commit()
     return jsonify(shipment.to_dict()), 201
 
+@shipments_bp.route('/search/', methods=['GET'])
+@jwt_required()
+def search_shipment():
+    hawb = request.args.get('hawb', '').strip().upper()
+    if not hawb:
+        return jsonify({'error': 'HAWB number is required'}), 400
+    shipment = Shipment.query.filter(
+        Shipment.hawb_number.ilike(f'%{hawb}%')
+    ).first()
+    if not shipment:
+        return jsonify({'error': f'No shipment found with HAWB: {hawb}'}), 404
+    return jsonify(shipment.to_dict()), 200
+
 @shipments_bp.route('/<int:id>/', methods=['GET'])
 @jwt_required()
 def get_shipment(id):
     shipment = Shipment.query.get_or_404(id)
+    return jsonify(shipment.to_dict()), 200
+
+@shipments_bp.route('/<int:id>/', methods=['PUT'])
+@jwt_required()
+def update_shipment(id):
+    shipment = Shipment.query.get_or_404(id)
+    data = request.get_json()
+    allowed = ['draft', 'booked', 'in_transit', 'out_for_delivery', 'delivered', 'cancelled']
+    if 'status' in data:
+        if data['status'] not in allowed:
+            return jsonify({'error': 'Invalid status value'}), 400
+        shipment.status = data['status']
+    db.session.commit()
     return jsonify(shipment.to_dict()), 200
 
 @shipments_bp.route('/<int:id>/', methods=['DELETE'])
