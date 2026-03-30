@@ -69,6 +69,7 @@ const Step6Review = () => {
             height: parseFloat(c.height) || 0,
             quantity: parseInt(c.quantity) || 1,
             actual_weight: parseFloat(c.actWeight) || 0,
+            volumetric_weight: parseFloat(c.volWeight) || 0,
         })),
     });
 
